@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS — Crystallized Dimension</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--neon1:#00f5ff;--neon2:#bf00ff;--neon3:#ff0090;--neon4:#00ff88;--neon5:#ffd700;--bg:#020408;--text:#e0e8ff}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;overflow-x:hidden}
+canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.site{position:relative;z-index:10}
+section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;position:relative;border-bottom:1px solid rgba(0,245,255,0.06)}
+.hero{padding-top:100px}
+h1.mega{font-size:clamp(2.2rem,7vw,5.5rem);font-weight:900;letter-spacing:0.06em;background:linear-gradient(90deg,var(--neon1),var(--neon2),var(--neon3),var(--neon4),var(--neon5),var(--neon1));background-size:400% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradShift 3s linear infinite;line-height:1.1;text-align:center}
+@keyframes gradShift{to{background-position:400% 0}}
+.sub{font-size:clamp(0.65rem,1.8vw,0.95rem);color:rgba(0,245,255,0.5);letter-spacing:0.35em;margin:1.2rem 0 2rem;text-transform:uppercase;text-align:center}
+.section-title{font-size:clamp(1.4rem,4vw,3rem);background:linear-gradient(90deg,var(--neon1),var(--neon4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:0.12em;margin-bottom:0.5rem;text-align:center}
+.section-sub{color:rgba(0,245,255,0.35);font-size:0.72rem;letter-spacing:0.25em;text-align:center;margin-bottom:3rem;text-transform:uppercase}
+.section-divider{width:180px;height:1px;background:linear-gradient(90deg,transparent,var(--neon1),transparent);margin:0 auto 2.5rem}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:14px 32px;background:rgba(2,4,8,0.85);backdrop-filter:blur(24px);border-bottom:1px solid rgba(0,245,255,0.08)}
+.nav-logo{font-size:1rem;font-weight:700;color:var(--neon1);letter-spacing:0.25em}
+.nav-links{display:flex;gap:20px;flex-wrap:wrap}
+.nav-links a{color:rgba(0,245,255,0.5);text-decoration:none;font-size:0.65rem;letter-spacing:0.18em;cursor:pointer;transition:color 0.3s;text-transform:uppercase}
+.nav-links a:hover{color:var(--neon1)}
+/* BUTTONS */
+.btn-primary{padding:13px 32px;background:transparent;border:1px solid var(--neon1);color:var(--neon1);font-family:inherit;font-size:0.8rem;letter-spacing:0.22em;cursor:pointer;border-radius:6px;transition:all 0.3s;position:relative;overflow:hidden;text-transform:uppercase}
+.btn-primary::before{content:'';position:absolute;inset:0;background:var(--neon1);transform:scaleX(0);transform-origin:left;transition:transform 0.3s;z-index:-1}
+.btn-primary:hover{color:#020408}.btn-primary:hover::before{transform:scaleX(1)}
+.btn-v2{border-color:var(--neon2);color:var(--neon2)}
+.btn-v2::before{background:var(--neon2)}
+/* STATS */
+.stats-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin:2.5rem 0}
+.stat{text-align:center;padding:18px 26px;border:1px solid rgba(0,245,255,0.12);border-radius:10px;background:rgba(0,245,255,0.02);min-width:110px}
+.stat-num{font-size:1.9rem;font-weight:700;color:var(--neon1)}
+.stat-label{font-size:0.6rem;color:rgba(224,232,255,0.35);letter-spacing:0.22em;margin-top:5px;text-transform:uppercase}
+/* CRYSTAL GRID */
+.crystal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;max-width:1200px;width:100%;margin:2rem auto}
+.crystal{background:linear-gradient(135deg,rgba(0,245,255,0.04),rgba(191,0,255,0.04));border:1px solid rgba(0,245,255,0.15);border-radius:14px;padding:22px;position:relative;overflow:hidden;cursor:pointer;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1)}
+.crystal::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(0,245,255,0.08),transparent);transform:translateX(-100%);transition:transform 0.6s}
+.crystal:hover{transform:translateY(-8px) scale(1.02);border-color:var(--neon1);box-shadow:0 0 40px rgba(0,245,255,0.2),0 0 80px rgba(191,0,255,0.1),inset 0 0 20px rgba(0,245,255,0.04)}
+.crystal:hover::before{transform:translateX(100%)}
+.crystal-icon{font-size:2.2rem;margin-bottom:10px;display:block}
+.crystal h3{font-size:0.85rem;color:var(--neon1);letter-spacing:0.12em;margin-bottom:8px;text-transform:uppercase}
+.crystal p{font-size:0.7rem;color:rgba(224,232,255,0.45);line-height:1.7}
+/* PARTICLE LAB */
+.particle-lab{width:100%;max-width:960px;height:420px;border:1px solid rgba(0,245,255,0.12);border-radius:18px;position:relative;overflow:hidden;background:rgba(0,0,0,0.6)}
+#pCanvas{width:100%;height:100%}
+.p-controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:1.5rem}
+.p-btn{padding:9px 18px;background:transparent;border:1px solid rgba(0,245,255,0.25);color:rgba(0,245,255,0.6);font-family:inherit;font-size:0.65rem;letter-spacing:0.18em;cursor:pointer;border-radius:5px;transition:all 0.3s;text-transform:uppercase}
+.p-btn:hover{border-color:var(--neon1);color:var(--neon1);background:rgba(0,245,255,0.04)}
+/* THEMES */
+.theme-carousel{display:flex;gap:14px;overflow-x:auto;padding:14px 0;max-width:1200px;width:100%;scrollbar-width:none}
+.theme-carousel::-webkit-scrollbar{display:none}
+.theme-card{min-width:170px;height:210px;border-radius:14px;position:relative;overflow:hidden;cursor:pointer;flex-shrink:0;transition:transform 0.3s;border:1px solid rgba(0,245,255,0.1)}
+.theme-card:hover{transform:scale(1.04);border-color:rgba(0,245,255,0.3)}
+.theme-card::after{content:attr(data-label);position:absolute;bottom:10px;left:10px;right:10px;font-size:0.6rem;color:#fff;letter-spacing:0.2em;text-transform:uppercase;text-shadow:0 1px 4px rgba(0,0,0,0.8)}
+.tc1{background:linear-gradient(135deg,#0d0221,#1a0533,#2d0f5e)}
+.tc2{background:linear-gradient(135deg,#001a0d,#003320,#004d2e)}
+.tc3{background:linear-gradient(135deg,#1a0000,#330000,#4d1a00)}
+.tc4{background:linear-gradient(135deg,#00001a,#000033,#001a4d)}
+.tc5{background:linear-gradient(135deg,#1a1000,#332000,#4d3000)}
+.tc6{background:linear-gradient(135deg,#1a0d1a,#331a33,#4d004d)}
+/* MUSIC VIZ */
+.music-viz{display:flex;align-items:flex-end;gap:4px;height:70px;justify-content:center;margin:1.5rem 0}
+.bar{width:7px;border-radius:4px 4px 0 0;background:linear-gradient(to top,var(--neon2),var(--neon1));animation:barDance 0.5s ease-in-out infinite alternate}
+@keyframes barDance{from{height:8%}to{height:100%}}
+/* SATELLITES */
+.satellite-ring{position:relative;width:280px;height:280px;margin:2rem auto}
+.s-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:radial-gradient(circle,var(--neon1),var(--neon2));box-shadow:0 0 30px var(--neon1),0 0 60px rgba(0,245,255,0.25)}
+.orbit{position:absolute;top:50%;left:50%;border:1px solid rgba(0,245,255,0.12);border-radius:50%;transform:translate(-50%,-50%)}
+.orbit1{width:110px;height:110px;animation:spin 4s linear infinite}
+.orbit2{width:186px;height:186px;animation:spin 7s linear infinite reverse}
+.orbit3{width:264px;height:264px;animation:spin 12s linear infinite}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.sat{position:absolute;width:10px;height:10px;border-radius:50%;top:-5px;left:50%;margin-left:-5px}
+.sat1{background:var(--neon1);box-shadow:0 0 8px var(--neon1)}
+.sat2{background:var(--neon3);box-shadow:0 0 8px var(--neon3)}
+.sat3{background:var(--neon4);box-shadow:0 0 8px var(--neon4)}
+/* EVOLVE LOG */
+.evolve-log{max-width:720px;width:100%;background:rgba(0,0,0,0.7);border:1px solid rgba(0,245,255,0.08);border-radius:10px;padding:18px 20px;height:220px;overflow-y:auto;font-size:0.68rem;line-height:2;color:rgba(0,245,255,0.65)}
+.evolve-log::-webkit-scrollbar{width:4px}
+.evolve-log::-webkit-scrollbar-track{background:transparent}
+.evolve-log::-webkit-scrollbar-thumb{background:rgba(0,245,255,0.2);border-radius:2px}
+.log-line{opacity:0;animation:fadeUp 0.5s forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+/* MOSAIC */
+.img-mosaic{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;max-width:1000px;width:100%;margin:2rem auto}
+.mosaic-cell{aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;cursor:pointer;animation:cellP 2.5s ease-in-out infinite;transition:transform 0.2s}
+.mosaic-cell:hover{transform:scale(1.3);z-index:5}
+@keyframes cellP{0%,100%{opacity:0.5}50%{opacity:1}}
+/* NIGHTINGALE */
+.nightingale{text-align:center;font-size:3.5rem;animation:floatDance 3s ease-in-out infinite}
+@keyframes floatDance{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-18px) rotate(4deg)}}
+/* PROGRESS DOTS */
+.pip-nav{position:fixed;right:18px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:300}
+.pip{width:6px;height:6px;border-radius:50%;background:rgba(0,245,255,0.15);border:1px solid rgba(0,245,255,0.25);transition:all 0.3s;cursor:pointer}
+.pip.active{background:var(--neon1);box-shadow:0 0 8px var(--neon1);width:8px;height:8px}
+/* BURST */
+.burst{position:fixed;width:4px;height:4px;border-radius:50%;pointer-events:none;z-index:9999;animation:burstAnim 0.8s forwards}
+@keyframes burstAnim{0%{transform:scale(0);opacity:1}100%{transform:scale(25);opacity:0}}
+/* FOOTER */
+footer{padding:50px 20px;text-align:center;color:rgba(224,232,255,0.2);font-size:0.65rem;letter-spacing:0.22em;line-height:2.5;border-top:1px solid rgba(0,245,255,0.06)}
+/* MOUSE TRAIL */
+.trail{position:fixed;pointer-events:none;z-index:5;width:6px;height:6px;border-radius:50%;animation:trailFade 0.5s forwards}
+@keyframes trailFade{to{transform:scale(0);opacity:0}}
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<nav>
+  <div class="nav-logo">⬡ NEXUS</div>
+  <div class="nav-links">
+    <a href="#hero">HOME</a>
+    <a href="#particles">PARTICLES</a>
+    <a href="#themes">THEMES</a>
+    <a href="#features">SYSTEMS</a>
+    <a href="#satellites">SATELLITES</a>
+    <a href="#evolve">AI CORE</a>
+    <a href="#gallery">GALLERY</a>
+  </div>
+</nav>
+
+<div class="pip-nav" id="pipNav"></div>
+
+<div class="site">
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="section-divider"></div>
+    <div class="sub">SELF-EVOLVING UNIVERSE · VERSION ∞.∞</div>
+    <h1 class="mega">CRYSTALLIZED<br>DIMENSION</h1>
+    <p style="color:rgba(0,245,255,0.35);font-size:0.75rem;letter-spacing:0.2em;margin:1.5rem 0 2.5rem;max-width:560px;text-align:center;line-height:2.2">Particle by particle. Layer by layer. A living ecosystem of light, intelligence, and infinite evolution. Every millisecond rewrites reality.</p>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center">
+      <button class="btn-primary" onclick="spawnBurst(event)">ENTER THE NEXUS</button>
+      <button class="btn-primary btn-v2" onclick="triggerEvolve()">FORCE EVOLVE</button>
+    </div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-num" id="sc1">847K</div><div class="stat-label">PARTICLES ACTIVE</div></div>
+      <div class="stat"><div class="stat-num" id="sc2">0</div><div class="stat-label">THEMES GENERATED</div></div>
+      <div class="stat"><div class="stat-num" id="sc3">0</div><div class="stat-label">EVOLUTIONS / SEC</div></div>
+      <div class="stat"><div class="stat-num">8K</div><div class="stat-label">IMAGE RESOLUTION</div></div>
+    </div>
+    <div class="nightingale">💃</div>
+    <p style="color:rgba(0,245,255,0.25);font-size:0.6rem;letter-spacing:0.3em;margin-top:6px">NIGHTINGALE DANCER · EMERGENT FORM</p>
+  </section>
+
+  <!-- PARTICLES -->
+  <section id="particles">
+    <h2 class="section-title">PARTICLE ENGINE</h2>
+    <p class="section-sub">REAL-TIME ADAPTIVE MOTION · SELF-TEACHING CLUSTERS</p>
+    <div class="particle-lab">
+      <canvas id="pCanvas"></canvas>
+    </div>
+    <div class="p-controls">
+      <button class="p-btn" onclick="setPMode('swarm')">SWARM</button>
+      <button class="p-btn" style="border-color:rgba(191,0,255,0.3);color:rgba(191,0,255,0.6)" onclick="setPMode('galaxy')">GALAXY</button>
+      <button class="p-btn" style="border-color:rgba(0,255,136,0.3);color:rgba(0,255,136,0.6)" onclick="setPMode('crystal')">CRYSTAL</button>
+      <button class="p-btn" style="border-color:rgba(255,0,144,0.3);color:rgba(255,0,144,0.6)" onclick="setPMode('chaos')">CHAOS</button>
+    </div>
+  </section>
+
+  <!-- THEMES -->
+  <section id="themes">
+    <h2 class="section-title">LIVING THEMES</h2>
+    <p class="section-sub">AI-GENERATED · SELF-MORPHING · TEACHING EACH OTHER</p>
+    <div class="theme-carousel">
+      <div class="theme-card tc1" data-label="VOID CRYSTAL" onclick="applyTheme(0)">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem">🔮</div>
+      </div>
+      <div class="theme-card tc2" data-label="EMERALD CORE" onclick="applyTheme(1)">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem">💚</div>
+      </div>
+      <div class="theme-card tc3" data-label="PLASMA FIRE" onclick="applyTheme(2)">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem">🔥</div>
+      </div>
+      <div class="theme-card tc4" data-label="DEEP OCEAN" onclick="applyTheme(3)">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem">🌊</div>
+      </div>
+      <div class="theme-card tc5" data-label="SOLAR GOLD" onclick="applyTheme(4)">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem">☀️</div>
+      </div>
+      <div class="theme-card tc6" data-label="NEBULA DREAM" onclick="applyTheme(5)">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem">🌌</div>
+      </div>
+    </div>
+    <div class="music-viz" id="musicViz"></div>
+    <p style="color:rgba(0,245,255,0.25);font-size:0.6rem;letter-spacing:0.3em">RHYTHMIC LIGHT ENGINE · NIGHTINGALE FREQUENCY</p>
+  </section>
+
+  <!-- CORE SYSTEMS -->
+  <section id="features">
+    <h2 class="section-title">CORE SYSTEMS</h2>
+    <p class="section-sub">INFRASTRUCTURE OF THE INFINITE</p>
+    <div class="crystal-grid">
+      <div class="crystal" onclick="spawnBurst(event)">
+        <span class="crystal-icon">🧠</span><h3>NEURAL CORE</h3>
+        <p>Self-evolving brain structure. Adapts topology every millisecond. Learns from particle collisions and emergent patterns.</p>
+      </div>
+      <div class="crystal" onclick="spawnBurst(event)">
+        <span class="crystal-icon">⚡</span><h3>PARTICLE ENGINE</h3>
+        <p>1M+ particles teaching each other. Dimming and lighting. New clusters form from destabilized structures continuously.</p>
+      </div>
+      <div class="crystal" onclick="spawnBurst(event)">
+        <span class="crystal-icon">💎</span><h3>CRYSTAL LATTICE</h3>
+        <p>Crystallized shapes with real-time deformation. High-energy nodes reinforce adjacent structures automatically.</p>
+      </div>
+      <div class="crystal" onclick="spawnBurst(event)">
+        <span class="crystal-icon">🛰️</span><h3>SATELLITE MESH</h3>
+        <p>Orbital infrastructure array. Real testing lines active. Full automation per projection screen layer.</p>
+      </div>
+      <div class="crystal" onclick="spawnBurst(event)">
+        <span class="crystal-icon">🌈</span><h3>LIGHT CAPTURE</h3>
+        <p>Particles inside particles. Dimming and lighting. Colorful vibrations inside font structures. Full vibrational mapping.</p>
+      </div>
+      <div class="crystal" onclick="spawnBurst(event)">
+        <span class="crystal-icon">🔄</span><h3>SELF-EVOLVE LOOP</h3>
+        <p>Every growth cycle ends in beautiful collapse. New layers emerge. Never a loop — always infinite growth.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SATELLITES -->
+  <section id="satellites">
+    <h2 class="section-title">SATELLITE ARRAY</h2>
+    <p class="section-sub">ORBITAL INFRASTRUCTURE · REAL-TIME TELEMETRY</p>
+    <div class="satellite-ring">
+      <div class="s-center"></div>
+      <div class="orbit orbit1"><div class="sat sat1"></div></div>
+      <div class="orbit orbit2"><div class="sat sat2"></div></div>
+      <div class="orbit orbit3"><div class="sat sat3"></div></div>
+    </div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-num">3</div><div class="stat-label">ACTIVE SATELLITES</div></div>
+      <div class="stat"><div class="stat-num">∞</div><div class="stat-label">DATA STREAMS</div></div>
+      <div class="stat"><div class="stat-num" id="latency">0ms</div><div class="stat-label">LATENCY</div></div>
+    </div>
+  </section>
+
+  <!-- AI EVOLVE LOG -->
+  <section id="evolve">
+    <h2 class="section-title">AI EVOLUTION LOG</h2>
+    <p class="section-sub">SELF-GENERATING · SELF-OPTIMIZING · SELF-DEPLOYING</p>
+    <div class="evolve-log" id="evolveLog"></div>
+    <button class="btn-primary" onclick="triggerEvolve()" style="margin-top:1.5rem">FORCE EVOLUTION CYCLE</button>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery">
+    <h2 class="section-title">DIMENSIONAL GALLERY</h2>
+    <p class="section-sub">8K ADAPTIVE IMAGES · SELF-RENDERING · THEME-AWARE</p>
+    <div class="img-mosaic" id="imgMosaic"></div>
+    <p style="color:rgba(0,245,255,0.25);font-size:0.6rem;letter-spacing:0.2em;margin-top:1rem;text-align:center">1,000,000 CONCEPTUAL IMAGE NODES · RENDERING SELECTED VIEWPORT</p>
+  </section>
+
+  <footer>
+    <p>NEXUS CRYSTALLIZED DIMENSION · SELF-EVOLVING UNIVERSE ENGINE v∞.∞</p>
+    <p>EVERY MILLISECOND IS A NEW REALITY · PARTICLES TEACH · SYSTEMS GROW · UNIVERSE EXPANDS</p>
+    <p style="margin-top:12px;color:rgba(0,245,255,0.15)">BUILT WITH LIGHT · POWERED BY EVOLUTION · ETERNAL</p>
+  </footer>
+</div>
+
+<script>
+// ── BG CANVAS ──
+const bgC=document.getElementById('bgCanvas');
+const bgX=bgC.getContext('2d');
+let BW,BH;
+function resizeBg(){BW=bgC.width=window.innerWidth;BH=bgC.height=window.innerHeight}
+resizeBg();window.addEventListener('resize',resizeBg);
+const COLS=['#00f5ff','#bf00ff','#ff0090','#00ff88','#ffd700'];
+const bgPs=[];
+for(let i=0;i<250;i++){bgPs.push({x:Math.random()*3000,y:Math.random()*3000,vx:(Math.random()-0.5)*0.25,vy:(Math.random()-0.5)*0.25,r:Math.random()*2+0.4,c:COLS[i%COLS.length],a:Math.random(),da:Math.random()*0.008+0.002})}
+function bgFrame(){
+  bgX.fillStyle='rgba(2,4,8,0.14)';bgX.fillRect(0,0,BW,BH);
+  bgPs.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.a+=p.da;
+    if(p.x<0)p.x=BW;if(p.x>BW)p.x=0;if(p.y<0)p.y=BH;if(p.y>BH)p.y=0;
+    const al=0.25+0.7*Math.abs(Math.sin(p.a));
+    bgX.beginPath();bgX.arc(p.x%BW,p.y%BH,p.r,0,Math.PI*2);
+    const hex=parseInt(p.c.slice(1),16);
+    const r=(hex>>16)&255,g=(hex>>8)&255,b=hex&255;
+    bgX.fillStyle=`rgba(${r},${g},${b},${al})`;bgX.fill();
+  });
+  requestAnimationFrame(bgFrame);
+}
+bgFrame();
+
+// ── PARTICLE CANVAS ──
+const pC=document.getElementById('pCanvas');
+const pX=pC.getContext('2d');
+let PW,PH;
+function resizeP(){PW=pC.width=pC.offsetWidth;PH=pC.height=pC.offsetHeight}
+resizeP();
+window.addEventListener('resize',()=>{resizeBg();resizeP()});
+let pMode='swarm',pTick=0;
+const pList=[];
+function mkP(){const c=COLS[Math.floor(Math.random()*COLS.length)];return{x:Math.random()*PW,y:Math.random()*PH,vx:(Math.random()-0.5)*1.5,vy:(Math.random()-0.5)*1.5,r:Math.random()*2.5+0.8,c,a:Math.random()*Math.PI*2,life:1,max:200+Math.random()*400,bx:Math.random()*PW,by:Math.random()*PH}}
+for(let i=0;i<200;i++)pList.push(mkP());
+function pFrame(){
+  resizeP();
+  pX.fillStyle='rgba(0,0,0,0.18)';pX.fillRect(0,0,PW,PH);
+  pTick++;
+  pList.forEach((p,i)=>{
+    p.life--;p.a+=0.018;
+    const age=p.life/p.max;
+    if(p.life<=0){Object.assign(p,mkP());return}
+    if(pMode==='swarm'){p.x+=p.vx+Math.sin(p.a*0.5)*0.4;p.y+=p.vy+Math.cos(p.a*0.3)*0.4;if(p.x<0||p.x>PW)p.vx*=-1;if(p.y<0||p.y>PH)p.vy*=-1}
+    else if(pMode==='galaxy'){const cx=PW/2,cy=PH/2,dx=cx-p.x,dy=cy-p.y,d=Math.sqrt(dx*dx+dy*dy)||1;p.vx+=dx/d*0.04-dy/d*0.3;p.vy+=dy/d*0.04+dx/d*0.3;p.vx*=0.97;p.vy*=0.97;p.x+=p.vx;p.y+=p.vy}
+    else if(pMode==='crystal'){const tx=p.bx+Math.sin(pTick*0.02+i)*28,ty=p.by+Math.cos(pTick*0.015+i)*28;p.x+=(tx-p.x)*0.05;p.y+=(ty-p.y)*0.05}
+    else{p.x+=p.vx*Math.sin(pTick*0.009+i);p.y+=p.vy*Math.cos(pTick*0.007+i);if(p.x<0)p.x=PW;if(p.x>PW)p.x=0;if(p.y<0)p.y=PH;if(p.y>PH)p.y=0}
+    const sz=p.r*(0.5+age*0.5);
+    const al=age*(0.4+0.6*Math.abs(Math.sin(p.a)));
+    pX.beginPath();pX.arc(p.x,p.y,sz,0,Math.PI*2);
+    pX.fillStyle=p.c;pX.globalAlpha=al;pX.fill();
+    if(i%3===0){pX.beginPath();pX.arc(p.x,p.y,sz*3.5,0,Math.PI*2);pX.fillStyle=p.c;pX.globalAlpha=al*0.06;pX.fill()}
+    pX.globalAlpha=1;
+    if(i%2===0){for(let j=i+1;j<Math.min(i+6,pList.length);j++){const q=pList[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.sqrt(dx*dx+dy*dy);if(d<90){pX.beginPath();pX.moveTo(p.x,p.y);pX.lineTo(q.x,q.y);pX.strokeStyle=p.c;pX.globalAlpha=(1-d/90)*0.14;pX.lineWidth=0.4;pX.stroke();pX.globalAlpha=1}}}
+  });
+  requestAnimationFrame(pFrame);
+}
+pFrame();
+function setPMode(m){pMode=m}
+
+// ── MUSIC BARS ──
+const mv=document.getElementById('musicViz');
+for(let i=0;i<40;i++){const b=document.createElement('div');b.className='bar';b.style.animationDelay=(i*0.055)+'s';b.style.animationDuration=(0.3+Math.random()*0.4)+'s';mv.appendChild(b)}
+
+// ── MOSAIC ──
+const mosaic=document.getElementById('imgMosaic');
+const mBg=['rgba(0,245,255,0.12)','rgba(191,0,255,0.12)','rgba(255,0,144,0.12)','rgba(0,255,136,0.12)','rgba(255,215,0,0.12)','rgba(255,107,0,0.12)'];
+const mBd=['#00f5ff','#bf00ff','#ff0090','#00ff88','#ffd700','#ff6b00'];
+const mIc=['✦','◈','⬡','◎','⊕','⋆','◉','⟐','✺','◇','⬟','✧'];
+for(let i=0;i<80;i++){const d=document.createElement('div');d.className='mosaic-cell';d.style.background=mBg[i%mBg.length];d.style.border='1px solid '+mBd[i%mBd.length]+'44';d.style.animationDelay=(i*0.03)+'s';d.textContent=mIc[i%mIc.length];d.style.color=mBd[i%mBd.length];d.style.opacity='0.5';d.onclick=()=>d.style.transform='scale(1.5)';mosaic.appendChild(d)}
+setInterval(()=>{const cells=mosaic.querySelectorAll('.mosaic-cell');const idx=Math.floor(Math.random()*cells.length);cells[idx].style.background=mBg[Math.floor(Math.random()*mBg.length)]},180);
+
+// ── EVOLVE LOG ──
+const LOGS=['[CORE] Neural topology reshaped — 847 new synaptic bridges formed','[PARTICLE] Cluster #3847 achieved self-replication. Spawning 1,200 daughters','[THEME] Deep Ocean × Void Crystal cross-pollination complete — hybrid born','[LATTICE] Crystal node 0xFF3A destabilized. Rebuilding with 23% more resilience','[SATELLITE] Orbital mesh synchronized. Latency: 0.0003ms','[EVOLVE] Generation 10,847 committed. Fitness score: +23.7%','[LIGHT] 4,200 photon captures logged. Particles inside particles: ACTIVE','[AI] Self-modifying weights updated. New emergent behavior detected at layer 12','[NEXUS] Layer 8,442 formed. Surprise coefficient: 0.98 — maximum novelty','[CRYSTAL] High-energy crystallization event. 7 shapes fused into single node','[DEPLOY] Auto-deployment triggered. 3 new dimensional sections spawned','[CORE] Brain structure grew 0.3% this millisecond. Acceleration detected'];
+const elog=document.getElementById('evolveLog');
+function addLog(){
+  const msg=LOGS[Math.floor(Math.random()*LOGS.length)];
+  const t=new Date().toLocaleTimeString('en',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const ms=Math.floor(Math.random()*999).toString().padStart(3,'0');
+  const d=document.createElement('div');d.className='log-line';
+  d.textContent=`[${t}.${ms}] ${msg}`;
+  elog.appendChild(d);
+  while(elog.children.length>35)elog.removeChild(elog.firstChild);
+  elog.scrollTop=elog.scrollHeight;
+}
+for(let i=0;i<10;i++)addLog();
+setInterval(addLog,850);
+function triggerEvolve(){for(let i=0;i<6;i++)setTimeout(addLog,i*120)}
+
+// ── COUNTERS ──
+let c1=847000,c2=12,c3=0;
+setInterval(()=>{
+  c1+=Math.floor(Math.random()*600)+200;c2+=Math.floor(Math.random()*3);c3=Math.floor(Math.random()*9999)+1000;
+  document.getElementById('sc1').textContent=(c1/1000).toFixed(1)+'K';
+  document.getElementById('sc2').textContent=c2;
+  document.getElementById('sc3').textContent=c3;
+  document.getElementById('latency').textContent=Math.floor(Math.random()*3)+'ms';
+},280);
+
+// ── THEME APPLY ──
+const THEMES=[['#00f5ff','#bf00ff','#020408'],['#00ff88','#00ccaa','#00100a'],['#ff6b00','#ff0040','#100000'],['#00aaff','#00f5ff','#000018'],['#ffd700','#ff8c00','#0d0800'],['#ff00ff','#bf00ff','#10001a']];
+function applyTheme(i){
+  const[c1,c2,bg]=THEMES[i];
+  document.documentElement.style.setProperty('--neon1',c1);
+  document.documentElement.style.setProperty('--neon2',c2);
+  document.body.style.background=bg;
+}
+
+// ── BURST ──
+function spawnBurst(e){
+  const el=document.createElement('div');el.className='burst';
+  const x=e.clientX||e.touches?.[0]?.clientX||window.innerWidth/2;
+  const y=e.clientY||e.touches?.[0]?.clientY||window.innerHeight/2;
+  el.style.cssText=`left:${x}px;top:${y}px;background:radial-gradient(circle,var(--neon1),transparent)`;
+  document.body.appendChild(el);setTimeout(()=>el.remove(),900);
+}
+
+// ── MOUSE TRAIL ──
+document.addEventListener('mousemove',e=>{
+  if(Math.random()>0.85){
+    const el=document.createElement('div');el.className='trail';
+    el.style.cssText=`left:${e.clientX}px;top:${e.clientY}px;background:var(--neon1);box-shadow:0 0 6px var(--neon1)`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),500);
+  }
+  // Crystal parallax
+  const mx=(e.clientX/window.innerWidth-0.5)*16,my=(e.clientY/window.innerHeight-0.5)*16;
+  document.querySelectorAll('.crystal').forEach((el,i)=>{
+    el.style.transform=`perspective(900px) rotateY(${mx*0.018*(i%2?1:-1)}deg) rotateX(${my*0.018*(i%3?1:-1)}deg)`;
+  });
+});
+
+// ── PROGRESS PIPS ──
+const SEC_IDS=['hero','particles','themes','features','satellites','evolve','gallery'];
+const pipNav=document.getElementById('pipNav');
+SEC_IDS.forEach((id,i)=>{
+  const d=document.createElement('div');d.className='pip'+(i===0?' active':'');
+  d.onclick=()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth'});
+  pipNav.appendChild(d);
+});
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){const i=SEC_IDS.indexOf(e.target.id);pipNav.querySelectorAll('.pip').forEach((p,j)=>p.classList.toggle('active',i===j))}});
+},{threshold:0.5});
+SEC_IDS.forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el)});
+</script>
+</body>
+</html>
