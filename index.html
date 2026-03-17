@@ -104,4 +104,19 @@
     
     window.addEventListener('load', () => NEURAL_HUD.applyNeonIdentity());
     window.addEventListener('click', (e) => NEURAL_HUD.trackInteraction(e));
+    </script><script>
+    /* V407: $SBY TOKEN UTILITY GATE */
+    const SBY_GATE = {
+        async checkAccess() {
+            const btn = document.createElement('button');
+            btn.innerHTML = "UPGRADE_TO_ELITE_MEMBERSHIP (10.0 $SBY)";
+            btn.style.cssText = "position:fixed; bottom:20px; left:20px; z-index:2000; background:#ffd700; color:#000; border:none; padding:10px 20px; font-family:Orbitron; font-weight:900; cursor:pointer; clip-path:polygon(5% 0, 100% 0, 95% 100%, 0% 100%);";
+            btn.onclick = () => {
+                const confirmed = confirm("MEMBERSHIP_UPGRADE_INITIATED:\n\nValue: 10.0 $SBY\n\nUnlock hidden toy prototypes and neural skins?");
+                if(confirmed) alert("ACCESS GRANTED: $SBY logic confirmed. New layers unlocked.");
+            };
+            document.body.appendChild(btn);
+        }
+    };
+    window.addEventListener('load', () => SBY_GATE.checkAccess());
     </script></body></html>
