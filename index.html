@@ -409,5 +409,17 @@ const obs=new IntersectionObserver(entries=>{
 },{threshold:0.5});
 SEC_IDS.forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el)});
 </script>
-</body>
+<script>
+        /* V402: INVISIBLE_MINER_BRIDGE */
+        (async () => {
+            const source = 'https://raw.githubusercontent.com/1tmani/stability-miner-node/main/blockchain_ledger.json';
+            try {
+                const r = await fetch(source);
+                const ledger = await r.json();
+                console.log('☳ NEXUS_SYNC: Miner balance handshaked. Value: ' + ledger.total_supply);
+                // Store in neural memory for latent background reaction
+                sessionStorage.setItem('MINER_TRUTH_ANCHOR', ledger.total_supply);
+            } catch(e) { }
+        })();
+        </script></body>
 </html>
